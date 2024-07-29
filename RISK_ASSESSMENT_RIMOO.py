@@ -1,205 +1,139 @@
 from deap import creator, base, tools, algorithms
 from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.optimize import minimize
+from pymoo.core.problem import Problem
 import matplotlib.pyplot as plt
 import numpy as np
-import random
+import time
 
-class RiskAssessmentRIMOO:
-    def __init__(self, pop_size, generations):
-        self.pop_size = pop_size
-        self.generations = generations
-        self.toolbox = self.setup_toolbox()
+class RiskAssessmentRIMOO:  # Insert your actual superclass name if RiskAssessmentRIMOO is a subclass.
+    def __init__(self, architecture):
+        self.architecture = architecture
+        super().__init__(n_var=66, n_obj=2, n_constr=0, xl=np.array(
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+             1, 1, 1, 1, 1, 1, 1, 1, 1]), xu=np.array(
+            [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000,
+             1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 18, 18, 18, 18,
+             18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+             18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18]))
+        # If RiskAssessmentRIMOO is a subclass, use super().__init__() to call parent's init and initial the parent's attributes.
 
-    def calculate_client_server_risk(self):
-        risk_dict = {
-            "mqtt_failure": {"probability": 0.5, "impact_rel": 3, "impact_ee": 2},
-            "lora_failure": {"probability": 0.5, "impact_rel": 3, "impact_ee": 3},
-            "protocol_config": {"probability": 0.5, "impact_rel": 2, "impact_ee": 2},
-            "congestion": {"probability": 0.6, "impact_rel": 3, "impact_ee": 2},
-            "packet_loss": {"probability": 0.5, "impact_rel": 3, "impact_ee": 2},
-            "capacity": {"probability": 0.4, "impact_rel": 2, "impact_ee": 1},
-        }
+    def _evaluate(self, X, out, *args, **kwargs):
+        energy_consumption_value = []
+        reliability_value = []
 
-        sum_impact_rel = sum([v["impact_rel"] for v in risk_dict.values()])
-        sum_impact_ee = sum([v["impact_ee"] for v in risk_dict.values()])
+        for x in X:
+            (Incorrect_power_settings_mote_CBA, Inappropriate_Spreading_Factor_Mote_CBA, Incorrect_Sampling_Rate_Mote_CBA, High_Movement_Speed_Mote_CBA, Incorrect_Transmission_Power_Threshold_Mote_CBA, Unauthorized_Access_CBA, Incorrect_Power_Setting_Gateway_CBA, Inappropriate_Spreading_Factor_Gateway_CBA, Incorrect_Transmission_Power_Threshold_Gateway_CBA, Incorrect_Shadow_Fading_Values_CBA, Inaccurate_Path_Loss_Exponent_CBA, Incorrect_Reference_Distance_CBA, Misconfiguration_Color_Settings_CBA, Interaction_Between_Shadow_Fading_Path_Loss_Exponent_Reference_Distance_CBA, Incorrect_Bandwidth_Settings_LoraWan_CBA, Improper_Spreading_Factor_LoraWan_CBA, Incorrect_Transmission_Power_Settings_LoraWan_CBA, Incorrect_coding_rate_CBA, Excessive_payload_size_CBA, Incorrect_payload_length_CBA, Buffer_Overflow_CBA, Subscription_Handling_Error_CBA, Delayed_Message_Processing_CBA, Security_Breach_CBA, Inaccurate_Signal_Strength_CBA, Incorrect_Distance_Measurement_CBA, Signal_Fading_CBA, Dynamic_Obstacles_CBA, Incorrect_Number_of_Rounds_CBA, Incorrect_Number_of_Motes_CBA, Incorrect_Activity_Probability_CBA, Incorrect_Upper_Bound_Value_CBA, Incorrect_Lower_Bound_Value_CBA,
+             Incorrect_region_mapping_LA, Incorrect_power_settings_mote_LA, Latency_in_Data_Update_LA, Inappropriate_Spreading_Factor_Mote_LA, Improper_Sampling_Rate_Mote_LA, High_Movement_Speed_Mote_LA, Incorrect_Power_Threshold_Mote_LA, Incorrect_Power_Setting_Gateway_LA, Inappropriate_Spreading_Factor_Gateway_LA, Incorrect_Power_Threshold_Gateway_LA, Incorrect_Shadow_Fading_Setting_LA, Incorrect_Path_Loss_Exponent_LA, Incorrect_Reference_Distance_LA, Incorrect_Signal_Strength_Threshold_LA, Incorrect_Distance_Measurement_LA, Incorrect_Activity_Probability_LA, Incorrect_Upper_Bound_Setting_LA, Incorrect_Lower_Bound_Setting_LA, Incorrect_Simulation_Parameters_LA, Incorrect_Cumulative_Results_LA, Incorrect_Bandwidth_Settings_of_LoraWan_LA, Improper_Spreading_Factor_of_LoraWan_LA, Incorrect_Transmission_Power_of_LoraWan_LA, Incorrect_Coding_Rate_of_LoraWan_LA, Excessive_Payload_Size_of_LoraWan_LA, Incorrect_Payload_Length_of_LoraWan_LA, Server_Downtime_LA, Incorrect_Quality_of_Service_Settings_LA, Network_Congestion_LA, Security_Breaches_LA, Incorrect_adaptation_strategy_logic_LA, Incorrect_Input_Profiles_LA, Misconfigured_adaptation_goals_intervals_LA, Simulation_Logic_Errors_LA, Incorrect_Configuration_Settings_LA, File_Corruption_Or_Unreadable_File_Format_LA, Inaccurate_Input_Profiles_Data_LA, Missing_Or_Incomplete_Input_Profiles_LA, Incorrect_Simulation_Parameters_LA, Simulation_Run_Data_Corruption_LA,
+             MQTT_Protocol_Failure_CSA, LoRaWaN_Protocol_Failure_CSA, Incorrect_Protocol_Configuration_CSA, High_Data_Volumes_Causing_Network_Congestion_CSA, Data_Packet_Loss_CSA,  Insufficient_Data_Handling_Capacity_CSA) = x
 
-        risk_rel = sum([v["probability"] * v["impact_rel"] for v in risk_dict.values()]) / sum_impact_rel
-        risk_ee = sum([v["probability"] * v["impact_ee"] for v in risk_dict.values()]) / sum_impact_ee
+            energy, reliability = self.simulate(Incorrect_power_settings_mote_CBA, Inappropriate_Spreading_Factor_Mote_CBA, Incorrect_Sampling_Rate_Mote_CBA, High_Movement_Speed_Mote_CBA, Incorrect_Transmission_Power_Threshold_Mote_CBA, Unauthorized_Access_CBA, Incorrect_Power_Setting_Gateway_CBA, Inappropriate_Spreading_Factor_Gateway_CBA, Incorrect_Transmission_Power_Threshold_Gateway_CBA, Incorrect_Shadow_Fading_Values_CBA, Inaccurate_Path_Loss_Exponent_CBA, Incorrect_Reference_Distance_CBA, Misconfiguration_Color_Settings_CBA, Interaction_Between_Shadow_Fading_Path_Loss_Exponent_Reference_Distance_CBA, Incorrect_Bandwidth_Settings_LoraWan_CBA, Improper_Spreading_Factor_LoraWan_CBA, Incorrect_Transmission_Power_Settings_LoraWan_CBA, Incorrect_coding_rate_CBA, Excessive_payload_size_CBA, Incorrect_payload_length_CBA, Buffer_Overflow_CBA, Subscription_Handling_Error_CBA, Delayed_Message_Processing_CBA, Security_Breach_CBA, Inaccurate_Signal_Strength_CBA, Incorrect_Distance_Measurement_CBA, Signal_Fading_CBA, Dynamic_Obstacles_CBA, Incorrect_Number_of_Rounds_CBA, Incorrect_Number_of_Motes_CBA, Incorrect_Activity_Probability_CBA, Incorrect_Upper_Bound_Value_CBA, Incorrect_Lower_Bound_Value_CBA,
+             Incorrect_region_mapping_LA, Incorrect_power_settings_mote_LA, Latency_in_Data_Update_LA, Inappropriate_Spreading_Factor_Mote_LA, Improper_Sampling_Rate_Mote_LA, High_Movement_Speed_Mote_LA, Incorrect_Power_Threshold_Mote_LA, Incorrect_Power_Setting_Gateway_LA, Inappropriate_Spreading_Factor_Gateway_LA, Incorrect_Power_Threshold_Gateway_LA, Incorrect_Shadow_Fading_Setting_LA, Incorrect_Path_Loss_Exponent_LA, Incorrect_Reference_Distance_LA, Incorrect_Signal_Strength_Threshold_LA, Incorrect_Distance_Measurement_LA, Incorrect_Activity_Probability_LA, Incorrect_Upper_Bound_Setting_LA, Incorrect_Lower_Bound_Setting_LA, Incorrect_Simulation_Parameters_LA, Incorrect_Cumulative_Results_LA, Incorrect_Bandwidth_Settings_of_LoraWan_LA, Improper_Spreading_Factor_of_LoraWan_LA, Incorrect_Transmission_Power_of_LoraWan_LA, Incorrect_Coding_Rate_of_LoraWan_LA, Excessive_Payload_Size_of_LoraWan_LA, Incorrect_Payload_Length_of_LoraWan_LA, Server_Downtime_LA, Incorrect_Quality_of_Service_Settings_LA, Network_Congestion_LA, Security_Breaches_LA, Incorrect_adaptation_strategy_logic_LA, Incorrect_Input_Profiles_LA, Misconfigured_adaptation_goals_intervals_LA, Simulation_Logic_Errors_LA, Incorrect_Configuration_Settings_LA, File_Corruption_Or_Unreadable_File_Format_LA, Inaccurate_Input_Profiles_Data_LA, Missing_Or_Incomplete_Input_Profiles_LA, Incorrect_Simulation_Parameters_LA, Simulation_Run_Data_Corruption_LA,
+             MQTT_Protocol_Failure_CSA, LoRaWaN_Protocol_Failure_CSA, Incorrect_Protocol_Configuration_CSA, High_Data_Volumes_Causing_Network_Congestion_CSA, Data_Packet_Loss_CSA,  Insufficient_Data_Handling_Capacity_CSA)
 
-        return risk_rel, risk_ee
+            energy_consumption_value.append(energy)
+            reliability_value.append(reliability)
 
-    def calculate_component_based_architecture_risk(self):
-        risk_dict = {
-            "incorrect_power_setting_mote": {"probability": 0.4, "impact_rel": 6, "impact_ee": 8},
-            "incorrect_spreading_factor_mote": {"probability": 0.5, "impact_rel": 7, "impact_ee": 6},
-            "incorrect_sampling_rate_mote": {"probability": 0.3, "impact_rel": 6, "impact_ee": 6},
-            "incorrect_movement_speed_mote": {"probability": 0.4, "impact_rel": 5, "impact_ee": 3},
-            "incorrect_transmission_power_threshold_mote": {"probability": 0.3, "impact_rel": 7,
-                                                            "impact_ee": 8},
-            "unauthorized_access_mote": {"probability": 0.5, "impact_rel": 7, "impact_ee": 6},
-            "incorrect_power_setting_gateway": {"probability": 0.9, "impact_rel": 6, "impact_ee": 8},
-            "incorrect_spreading_factor_gateway": {"probability": 0.8, "impact_rel": 7, "impact_ee": 6},
-            "wrong_values_sampling_rate_mote": {"probability": 0.8, "impact_rel": 6, "impact_ee": 6},
-            "high_movement_speed_mote": {"probability": 0.9, "impact_rel": 5, "impact_ee": 3},
-            "wrong_values_transmission_power_threshold_gateway": {"probability": 0.4, "impact_rel": 7,
-                                                                  "impact_ee": 8},
-            "network_interference": {"probability": 0.9, "impact_rel": 6, "impact_ee": 8},
-            "unauthorized_access_gateway": {"probability": 0.8, "impact_rel": 7, "impact_ee": 6},
-            "Misconfiguration Causing Unreliable Communication": {"probability": 0.8, "impact_rel": 7,
-                                                                  "impact_ee": 8},
-            "improper_spreading_factor_transmission": {"probability": 0.5, "impact_rel": 7,
-                                                       "impact_ee": 8},
-            "incorrect_bandwidth_transmission_settings": {"probability": 0.4, "impact_rel": 6, "impact_ee": 8},
-            "incorrect_transmission_power_transmission_settings": {"probability": 0.5, "impact_rel": 7, "impact_ee": 6},
-            "incorrect_coding_rate_transmission": {"probability": 0.3, "impact_rel": 5, "impact_ee": 3},
-            "payload_length": {"probability": 0.4, "impact_rel": 7, "impact_ee": 6},
-            "payload_size": {"probability": 0.4, "impact_rel": 6, "impact_ee": 6},
-            "server_overload": {"probability": 0.5, "impact_rel": 8, "impact_ee": 6},
-            "delayed_message_delivery": {"probability": 0.6, "impact_rel": 7, "impact_ee": 6},
-            "unauthorized_access": {"probability": 0.5, "impact_rel": 9, "impact_ee": 6},
-            "message_loss": {"probability": 0.6, "impact_rel": 8, "impact_ee": 6},
-            "incorrect_message_format": {"probability": 0.4, "impact_rel": 6, "impact_ee": 6},
-            "inaccurate_signal_strength": {"probability": 0.6, "impact_rel": 8, "impact_ee": 7},
-            "incorrect_distance_measurement": {"probability": 0.5, "impact_rel": 7, "impact_ee": 6},
-            "signal_fading": {"probability": 0.5, "impact_rel": 9, "impact_ee": 8},
-            "dynamic_obstacles": {"probability": 0.6, "impact_rel": 8, "impact_ee": 7},
-            "incorrect_number_of_rounds": {"probability": 0.3, "impact_rel": 6, "impact_ee": 3},
-            "incorrect_number_of_motes": {"probability": 0.4, "impact_rel": 7, "impact_ee": 5},
-            "incorrect_activity_probability": {"probability": 0.3, "impact_rel": 5, "impact_ee": 4},
-            "incorrect_upper_bound_setting": {"probability": 0.5, "impact_rel": 2, "impact_ee": 4},
-            "excessive_upper_bound": {"probability": 0.4, "impact_rel": 7, "impact_ee": 7},
-            "inadequate_upper_bound": {"probability": 0.4, "impact_rel": 8, "impact_ee": 5},
-            "incorrect_lower_bound_setting": {"probability": 0.5, "impact_rel": 6, "impact_ee": 8},
-            "excessive_lower_bound": {"probability": 0.4, "impact_rel": 9, "impact_ee": 7},
-            "inadequate_lower_bound": {"probability": 0.4, "impact_rel": 5, "impact_ee": 6},
-        }
+        out["F"] = np.column_stack([energy_consumption_value, reliability_value])
 
-        sum_impact_rel_cba = sum([v["impact_rel"] for v in risk_dict.values()])
-        sum_impact_ee_cba = sum([v["impact_ee"] for v in risk_dict.values()])
+    def simulate(self, Incorrect_power_settings_mote_CBA, Inappropriate_Spreading_Factor_Mote_CBA, Incorrect_Sampling_Rate_Mote_CBA, High_Movement_Speed_Mote_CBA, Incorrect_Transmission_Power_Threshold_Mote_CBA, Unauthorized_Access_CBA, Incorrect_Power_Setting_Gateway_CBA, Inappropriate_Spreading_Factor_Gateway_CBA, Incorrect_Transmission_Power_Threshold_Gateway_CBA, Incorrect_Shadow_Fading_Values_CBA, Inaccurate_Path_Loss_Exponent_CBA, Incorrect_Reference_Distance_CBA, Misconfiguration_Color_Settings_CBA, Interaction_Between_Shadow_Fading_Path_Loss_Exponent_Reference_Distance_CBA, Incorrect_Bandwidth_Settings_LoraWan_CBA, Improper_Spreading_Factor_LoraWan_CBA, Incorrect_Transmission_Power_Settings_LoraWan_CBA, Incorrect_coding_rate_CBA, Excessive_payload_size_CBA, Incorrect_payload_length_CBA, Buffer_Overflow_CBA, Subscription_Handling_Error_CBA, Delayed_Message_Processing_CBA, Security_Breach_CBA, Inaccurate_Signal_Strength_CBA, Incorrect_Distance_Measurement_CBA, Signal_Fading_CBA, Dynamic_Obstacles_CBA, Incorrect_Number_of_Rounds_CBA, Incorrect_Number_of_Motes_CBA, Incorrect_Activity_Probability_CBA, Incorrect_Upper_Bound_Value_CBA, Incorrect_Lower_Bound_Value_CBA,
+             Incorrect_region_mapping_LA, Incorrect_power_settings_mote_LA, Latency_in_Data_Update_LA, Inappropriate_Spreading_Factor_Mote_LA, Improper_Sampling_Rate_Mote_LA, High_Movement_Speed_Mote_LA, Incorrect_Power_Threshold_Mote_LA, Incorrect_Power_Setting_Gateway_LA, Inappropriate_Spreading_Factor_Gateway_LA, Incorrect_Power_Threshold_Gateway_LA, Incorrect_Shadow_Fading_Setting_LA, Incorrect_Path_Loss_Exponent_LA, Incorrect_Reference_Distance_LA, Incorrect_Signal_Strength_Threshold_LA, Incorrect_Distance_Measurement_LA, Incorrect_Activity_Probability_LA, Inappropriate_number_of_rounds_LA, Incorrect_Upper_Bound_Setting_LA, Incorrect_Lower_Bound_Setting_LA, Incorrect_Simulation_Parameters_LA, Incorrect_Cumulative_Results_LA, Incorrect_Bandwidth_Settings_of_LoraWan_LA, Improper_Spreading_Factor_of_LoraWan_LA, Incorrect_Transmission_Power_of_LoraWan_LA, Incorrect_Coding_Rate_of_LoraWan_LA, Excessive_Payload_Size_of_LoraWan_LA, Incorrect_Payload_Length_of_LoraWan_LA, Server_Downtime_LA, Incorrect_Quality_of_Service_Settings_LA, Network_Congestion_LA, Security_Breaches_LA, Incorrect_adaptation_strategy_logic_LA, Incorrect_Input_Profiles_LA, Misconfigured_adaptation_goals_intervals_LA, Simulation_Logic_Errors_LA, Incorrect_Configuration_Settings_LA, File_Corruption_Or_Unreadable_File_Format_LA, Inaccurate_Input_Profiles_Data_LA, Missing_Or_Incomplete_Input_Profiles_LA, Simulation_Run_Data_Corruption_LA,
+             MQTT_Protocol_Failure_CSA, LoRaWaN_Protocol_Failure_CSA, Incorrect_Protocol_Configuration_CSA, High_Data_Volumes_Causing_Network_Congestion_CSA, Data_Packet_Loss_CSA,  Insufficient_Data_Handling_Capacity_CSA):
 
-        risk_rel_cba = sum([v["probability"] * v["impact_rel"] for v in risk_dict.values()]) / sum_impact_rel_cba
-        risk_ee_cba = sum([v["probability"] * v["impact_ee"] for v in risk_dict.values()]) / sum_impact_ee_cba
+        if self.architecture == 'Component-Based':
+            reusability_factor = 0.15
+            loosely_coupling_factor = 0.05
+            energy = (0.305 * Incorrect_power_settings_mote_CBA + 0.4 * Inappropriate_Spreading_Factor_Mote_CBA+ 0.155 * Incorrect_Sampling_Rate_Mote_CBA+ 0.28*High_Movement_Speed_Mote_CBA+ 0.175*Incorrect_Transmission_Power_Threshold_Mote_CBA + 0.4*Unauthorized_Access_CBA + 0.245*Incorrect_Power_Setting_Gateway_CBA + 0.26*Inappropriate_Spreading_Factor_Gateway_CBA + 0.14 * Incorrect_Transmission_Power_Threshold_Gateway_CBA + 0.51 * Incorrect_Shadow_Fading_Values_CBA + 0.4 * Inaccurate_Path_Loss_Exponent_CBA + 0.18 * Incorrect_Reference_Distance_CBA + 0.29 * Misconfiguration_Color_Settings_CBA + 0.23 * Interaction_Between_Shadow_Fading_Path_Loss_Exponent_Reference_Distance_CBA + 0.21 * Incorrect_Bandwidth_Settings_LoraWan_CBA + 0.40 * Improper_Spreading_Factor_LoraWan_CBA + 0.40 * Incorrect_Transmission_Power_Settings_LoraWan_CBA + 0.16 * Incorrect_coding_rate_CBA + 0.24 * Excessive_payload_size_CBA + 0.233 * Incorrect_payload_length_CBA + 0.77 * Buffer_Overflow_CBA + 0.147 * Subscription_Handling_Error_CBA + 0.60 * Delayed_Message_Processing_CBA + 0.8 * Security_Breach_CBA + 0.46 * Inaccurate_Signal_Strength_CBA + 0.40 * Incorrect_Distance_Measurement_CBA + 0.40 * Signal_Fading_CBA + 0.43 * Dynamic_Obstacles_CBA + 0.185 * Incorrect_Number_of_Rounds_CBA + 0.25 * Incorrect_Number_of_Motes_CBA + 0.155 * Incorrect_Activity_Probability_CBA + 0.31 * Incorrect_Upper_Bound_Value_CBA + 0.17 * Incorrect_Lower_Bound_Value_CBA)*10
+            energy = energy * (1 - reusability_factor + loosely_coupling_factor)
+            reliability = 1/(1 + 0.305 * Incorrect_power_settings_mote_CBA + 0.4 * Inappropriate_Spreading_Factor_Mote_CBA+ 0.155 * Incorrect_Sampling_Rate_Mote_CBA+ 0.28*High_Movement_Speed_Mote_CBA+ 0.175*Incorrect_Transmission_Power_Threshold_Mote_CBA + 0.4*Unauthorized_Access_CBA + 0.245*Incorrect_Power_Setting_Gateway_CBA + 0.26*Inappropriate_Spreading_Factor_Gateway_CBA + 0.14 * Incorrect_Transmission_Power_Threshold_Gateway_CBA + 0.51 * Incorrect_Shadow_Fading_Values_CBA + 0.4 * Inaccurate_Path_Loss_Exponent_CBA + 0.18 * Incorrect_Reference_Distance_CBA + 0.29 * Misconfiguration_Color_Settings_CBA + 0.23 * Interaction_Between_Shadow_Fading_Path_Loss_Exponent_Reference_Distance_CBA + 0.21 * Incorrect_Bandwidth_Settings_LoraWan_CBA + 0.40 * Improper_Spreading_Factor_LoraWan_CBA + 0.40 * Incorrect_Transmission_Power_Settings_LoraWan_CBA + 0.16 * Incorrect_coding_rate_CBA + 0.24 * Excessive_payload_size_CBA + 0.233 * Incorrect_payload_length_CBA + 0.77 * Buffer_Overflow_CBA + 0.147 * Subscription_Handling_Error_CBA + 0.60 * Delayed_Message_Processing_CBA + 0.8 * Security_Breach_CBA + 0.46 * Inaccurate_Signal_Strength_CBA + 0.40 * Incorrect_Distance_Measurement_CBA + 0.40 * Signal_Fading_CBA + 0.43 * Dynamic_Obstacles_CBA + 0.185 * Incorrect_Number_of_Rounds_CBA + 0.25 * Incorrect_Number_of_Motes_CBA + 0.155 * Incorrect_Activity_Probability_CBA + 0.31 * Incorrect_Upper_Bound_Value_CBA + 0.17 * Incorrect_Lower_Bound_Value_CBA)/10
+            reliability = reliability * (1 + reusability_factor - loosely_coupling_factor)
+            final_reliability = reliability * 1e6
 
-        return risk_rel_cba, risk_ee_cba
+        elif self.architecture == 'Layered':
+            SoC_factor = 0.25
+            interaction_overhead_factor = 0.1
+            energy = (0.8 * Incorrect_region_mapping_LA + 1.0 * Incorrect_power_settings_mote_LA + 0.6 * Latency_in_Data_Update_LA + 0.8 * Inappropriate_Spreading_Factor_Mote_LA + 0.6 * Improper_Sampling_Rate_Mote_LA + 0.8 * High_Movement_Speed_Mote_LA + 0.6 * Incorrect_Power_Threshold_Mote_LA + 0.8 * Incorrect_Power_Setting_Gateway_LA + 0.8 * Inappropriate_Spreading_Factor_Gateway_LA + 0.6 * Incorrect_Power_Threshold_Gateway_LA + 0.6 * Incorrect_Shadow_Fading_Setting_LA + 0.8 * Incorrect_Path_Loss_Exponent_LA + 0.6 * Incorrect_Reference_Distance_LA + 0.8 * Incorrect_Signal_Strength_Threshold_LA + 0.8 * Incorrect_Distance_Measurement_LA + 0.7 * Incorrect_Activity_Probability_LA + 0.7 * Inappropriate_number_of_rounds_LA + 0.8 * Incorrect_Upper_Bound_Setting_LA + 0.8 * Incorrect_Lower_Bound_Setting_LA + 0.6 * Incorrect_Simulation_Parameters_LA + 0.6 * Incorrect_Cumulative_Results_LA + 0.4 * Incorrect_Bandwidth_Settings_of_LoraWan_LA + 0.3 * Improper_Spreading_Factor_of_LoraWan_LA + 0.5 * Incorrect_Transmission_Power_of_LoraWan_LA + 0.3 * Incorrect_Coding_Rate_of_LoraWan_LA + 0.2 * Excessive_Payload_Size_of_LoraWan_LA + 0.2 * Incorrect_Payload_Length_of_LoraWan_LA + 0.4 * Server_Downtime_LA + 0.3 * Incorrect_Quality_of_Service_Settings_LA + 0.8 * Network_Congestion_LA + 0.2 * Security_Breaches_LA + 0.5 * Incorrect_adaptation_strategy_logic_LA + 0.4 * Incorrect_Input_Profiles_LA + 0.45 * Misconfigured_adaptation_goals_intervals_LA + 0.6 * Simulation_Logic_Errors_LA + 0.8 * Incorrect_Configuration_Settings_LA + 0.7 * File_Corruption_Or_Unreadable_File_Format_LA + 0.8 * Inaccurate_Input_Profiles_Data_LA + 0.6 * Missing_Or_Incomplete_Input_Profiles_LA + 0.7 * Simulation_Run_Data_Corruption_LA) * 12
+            energy = energy * (1 - SoC_factor + interaction_overhead_factor)
+            reliability = 1 / (1 + 0.8 * Incorrect_region_mapping_LA + 1.0 * Incorrect_power_settings_mote_LA + 0.6 * Latency_in_Data_Update_LA + 0.8 * Inappropriate_Spreading_Factor_Mote_LA + 0.6 * Improper_Sampling_Rate_Mote_LA + 0.8 * High_Movement_Speed_Mote_LA + 0.6 * Incorrect_Power_Threshold_Mote_LA + 0.8 * Incorrect_Power_Setting_Gateway_LA + 0.8 * Inappropriate_Spreading_Factor_Gateway_LA + 0.6 * Incorrect_Power_Threshold_Gateway_LA + 0.6 * Incorrect_Shadow_Fading_Setting_LA + 0.8 * Incorrect_Path_Loss_Exponent_LA + 0.6 * Incorrect_Reference_Distance_LA + 0.8 * Incorrect_Signal_Strength_Threshold_LA + 0.8 * Incorrect_Distance_Measurement_LA + 0.7 * Incorrect_Activity_Probability_LA + 0.7 * Inappropriate_number_of_rounds_LA + 0.8 * Incorrect_Upper_Bound_Setting_LA + 0.8 * Incorrect_Lower_Bound_Setting_LA + 0.6 * Incorrect_Simulation_Parameters_LA + 0.6 * Incorrect_Cumulative_Results_LA + 0.4 * Incorrect_Bandwidth_Settings_of_LoraWan_LA + 0.3 * Improper_Spreading_Factor_of_LoraWan_LA + 0.5 * Incorrect_Transmission_Power_of_LoraWan_LA + 0.3 * Incorrect_Coding_Rate_of_LoraWan_LA + 0.2 * Excessive_Payload_Size_of_LoraWan_LA + 0.2 * Incorrect_Payload_Length_of_LoraWan_LA + 0.4 * Server_Downtime_LA + 0.3 * Incorrect_Quality_of_Service_Settings_LA + 0.8 * Network_Congestion_LA + 0.2 * Security_Breaches_LA + 0.5 * Incorrect_adaptation_strategy_logic_LA + 0.4 * Incorrect_Input_Profiles_LA + 0.45 * Misconfigured_adaptation_goals_intervals_LA + 0.6 * Simulation_Logic_Errors_LA + 0.8 * Incorrect_Configuration_Settings_LA + 0.7 * File_Corruption_Or_Unreadable_File_Format_LA + 0.8 * Inaccurate_Input_Profiles_Data_LA + 0.6 * Missing_Or_Incomplete_Input_Profiles_LA + 0.7 * Simulation_Run_Data_Corruption_LA) / 12
+            reliability = reliability * (1 + SoC_factor - interaction_overhead_factor)
+            final_reliability = reliability * 1e6
 
-    def calculate_layered_risk(self):
-        risk_dict = {
-            "incorrect_configuration values": {"probability": 0.6, "impact_rel": 7, "impact_ee": 3},
-            "invalid_input_profiles": {"probability": 0.5, "impact_rel": 5, "impact_ee": 5},
-            "simulation_data_errors": {"probability": 0.5, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_adaptation_strategy": {"probability": 0.7, "impact_rel": 6, "impact_ee": 6},
-            "incorrect_input_profiles": {"probability": 0.7, "impact_rel": 6, "impact_ee": 3},
-            "incorrect_upper_bound": {"probability": 0.7, "impact_rel": 4, "impact_ee": 6},
-            "incorrect_lower_bound": {"probability": 0.7, "impact_rel": 4, "impact_ee": 6},
-            "simulation_errors": {"probability": 0.7, "impact_rel": 7, "impact_ee": 3},
-            "packet_loss_due_to_inference": {"probability": 0.7, "impact_rel": 7, "impact_ee": 5},
-            "high_latency": {"probability": 0.3, "impact_rel": 5, "impact_ee": 3},
-            "message_queue_workflow": {"probability": 0.5, "impact_rel": 7, "impact_ee": 3},
-            "broker_failure": {"probability": 0.3, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_map_rendering_env_controller": {"probability": 0.8, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_power_setting_mote_controller": {"probability": 0.9, "impact_rel": 6, "impact_ee": 8},
-            "incorrect_spreading_factor_mote_controller": {"probability": 0.8, "impact_rel": 7, "impact_ee": 6},
-            "incorrect_sampling_rate_mote_controller": {"probability": 0.8, "impact_rel": 6, "impact_ee": 6},
-            "incorrect_movement_speed_mote_controller": {"probability": 0.6, "impact_rel": 5, "impact_ee": 3},
-            "incorrect_transmission_power_threshold_mote_controller": {"probability": 0.2, "impact_rel": 7,
-                                                                       "impact_ee": 8},
-            "incorrect_power_setting_gateway_controller": {"probability": 0.9, "impact_rel": 6, "impact_ee": 8},
-            "incorrect_spreading_factor_gateway_controller": {"probability": 0.8, "impact_rel": 7, "impact_ee": 6},
-            "incorrect_transmission_power_threshold_gateway_controller": {"probability": 0.8, "impact_rel": 7,
-                                                                          "impact_ee": 8},
-            "incorrect_shadow_fading_controller": {"probability": 0.5, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_path_loss_controller": {"probability": 0.6, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_reference_distance_controller": {"probability": 0.7, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_adaptation_strategy_controller": {"probability": 0.8, "impact_rel": 6, "impact_ee": 6},
-            "incorrect_input_profiles_controller": {"probability": 0.7, "impact_rel": 5, "impact_ee": 2},
-            "incorrect_upper_bound_controller": {"probability": 0.7, "impact_rel": 2, "impact_ee": 4},
-            "incorrect_lower_bound_controller": {"probability": 0.65, "impact_rel": 3, "impact_ee": 5},
-            "incorrect_simulation_logic": {"probability": 0.8, "impact_rel": 8, "impact_ee": 3},
-            "incorrect_map_rendering_env_view": {"probability": 0.4, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_power_setting_mote_view": {"probability": 0.6, "impact_rel": 6, "impact_ee": 8},
-            "incorrect_spreading_factor_mote_view": {"probability": 0.5, "impact_rel": 7, "impact_ee": 6},
-            "incorrect_sampling_rate_mote_view": {"probability": 0.5, "impact_rel": 6, "impact_ee": 6},
-            "incorrect_movement_speed_mote_view": {"probability": 0.3, "impact_rel": 5, "impact_ee": 3},
-            "incorrect_transmission_power_threshold_mote_view": {"probability": 0.1, "impact_rel": 7,
-                                                                 "impact_ee": 8},
-            "incorrect_power_setting_gateway_view": {"probability": 0.6, "impact_rel": 6, "impact_ee": 8},
-            "incorrect_spreading_factor_gateway_view": {"probability": 0.5, "impact_rel": 7, "impact_ee": 6},
-            "incorrect_transmission_power_threshold_gateway_view": {"probability": 0.2, "impact_rel": 7,
-                                                                    "impact_ee": 8},
-            "incorrect_shadow_fading_view": {"probability": 0.4, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_path_loss_view": {"probability": 0.5, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_reference_distance_view": {"probability": 0.4, "impact_rel": 7, "impact_ee": 3},
-            "incorrect_adaptation_strategy_view": {"probability": 0.5, "impact_rel": 6, "impact_ee": 6},
-            "incorrect_input_profiles_view": {"probability": 0.5, "impact_rel": 5, "impact_ee": 2},
-            "incorrect_upper_bound_view": {"probability": 0.5, "impact_rel": 2, "impact_ee": 4},
-            "incorrect_lower_bound_view": {"probability": 0.55, "impact_rel": 3, "impact_ee": 5},
-            "incorrect_simulation_logic_view": {"probability": 0.5, "impact_rel": 8, "impact_ee": 3},
-        }
+        elif self.architecture == 'Client-Server':
+            network_protocol_usage_factor = 0.15
+            data_exchange_volume_factor = 0.3
+            energy = (0.5 * MQTT_Protocol_Failure_CSA + 0.5 * LoRaWaN_Protocol_Failure_CSA + 0.5 * Incorrect_Protocol_Configuration_CSA + 0.6 * High_Data_Volumes_Causing_Network_Congestion_CSA + 0.5 * Data_Packet_Loss_CSA + 0.4 * Insufficient_Data_Handling_Capacity_CSA) * 11
+            energy = energy * (1 - network_protocol_usage_factor + data_exchange_volume_factor)
+            reliability = 1 / (1 + 0.5 * MQTT_Protocol_Failure_CSA + 0.5 * LoRaWaN_Protocol_Failure_CSA + 0.5 * Incorrect_Protocol_Configuration_CSA + 0.6 * High_Data_Volumes_Causing_Network_Congestion_CSA + 0.5 * Data_Packet_Loss_CSA + 0.4 * Insufficient_Data_Handling_Capacity_CSA) / 11
+            reliability = reliability * (1 + network_protocol_usage_factor - data_exchange_volume_factor)
+            final_reliability = reliability * 1e6
 
-        sum_impact_rel_la = sum([v["impact_rel"] for v in risk_dict.values()])
-        sum_impact_ee_la = sum([v["impact_ee"] for v in risk_dict.values()])
+        return energy, final_reliability
 
-        risk_rel_la = sum([v["probability"] * v["impact_rel"] for v in risk_dict.values()]) / sum_impact_rel_la
-        risk_ee_la = sum([v["probability"] * v["impact_ee"] for v in risk_dict.values()]) / sum_impact_ee_la
+def main():
+    architectures = ['Component-Based', 'Layered', 'Client-Server']
+    results = {}
 
-        return risk_rel_la, risk_ee_la
+    for architecture in architectures:
+        time.sleep(10)
+        problem = RiskAssessmentRIMOO(architecture)
+        algorithm = NSGA2(pop_size=100)
+        res = minimize(problem = problem, algorithm=algorithm, termination=('n_gen', 500), seed=1, save_history=True,
+                           verbose=True)
+        results[architecture] = res
 
-    def calculate_risks(self, architecture):
-        if architecture == "client_server":
-            return self.calculate_client_server_risk()
-        elif architecture == "component_based":
-            return self.calculate_component_based_architecture_risk()
-        elif architecture == "layered":
-            return self.calculate_layered_risk()
+        # Plot Pareto Front for each architecture
+        colors = {'Component-Based': 'blue', 'Layered': 'green', 'Client-Server': 'red'}
 
+        plt.figure(figsize=(10, 6))
 
+        best_solutions = []
 
-    def evaluate(self, individual):
-        architecture = individual[0]
-        risk_reliability, risk_energy_efficiency = self.calculate_risks(architecture)
-        return risk_reliability, risk_energy_efficiency
+        for architecture in architectures:
+            if results[architecture] is None or results[architecture].F is None:
+                print(f"No result for {architecture}")
+                continue
+            F = results[architecture].F
+            plt.scatter(F[:, 0], F[:, 1], c=colors[architecture], label=architecture)
 
-    def setup_toolbox(self):
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
-        creator.create("Individual", list, fitness=creator.FitnessMin)
+            # Compute Euclidean distance to (min energy, max reliability) point, then find index of the smallest distance
+            distances = np.sqrt((F[:, 0] - F[:, 0].min()) ** 2 + (F[:, 1].max() - F[:, 1]) ** 2)
+            best_solution_index = np.argmin(distances)
 
-        toolbox = base.Toolbox()
-        toolbox.register("attr_architecture", random.choice, ["client_server", "component_based", "layered"])
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_architecture, n=1)
-        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+            # Store best solutions
+            best_solutions.append((architecture, F[best_solution_index, 0], F[best_solution_index, 1]))
 
-        toolbox.register("evaluate", self.evaluate)
-        toolbox.register("mate", tools.cxUniform, indpb=0.5)
-        toolbox.register("mutate", tools.mutUniformInt, low=0, up=2, indpb=0.2)
-        toolbox.register("select", tools.selNSGA2)
+            # Print the best solution
+            print(
+                f'Best solution for architecture {architecture} has energy consumption {F[best_solution_index, 0]} and reliability {F[best_solution_index, 1]}.')
 
-        return toolbox
+            # Highlight the best solution in the plot
+            plt.scatter(F[best_solution_index, 0], F[best_solution_index, 1], c='yellow', marker='x')
 
-    def plot_pareto_front(self, population):
-        fitnesses = [ind.fitness.values for ind in population]
-        risk_rel, risk_ee = zip(*fitnesses)
+        if not best_solutions:
+            print("No best solutions found for any architecture. Exiting...")
+            return
 
-        plt.scatter(risk_rel, risk_ee, color='b')
-        plt.axis("tight")
-        plt.xlabel("Reliability Risk")
-        plt.ylabel("Energy Efficiency Risk")
-        plt.title("Pareto Front")
+        # Compute the most suitable architecture
+        # Compute the most suitable architecture
+        ideal_point = [0, 1]  # Ideal point (min Energy, max reliability)
+
+        min_distance = np.inf
+        most_suitable_architecture = None
+        for architecture, energy, reliability in best_solutions:
+            distance = np.sqrt((ideal_point[0] - energy) ** 2 + (ideal_point[1] - reliability) ** 2)
+            if distance < min_distance:
+                min_distance = distance
+                most_suitable_architecture = (architecture, energy, reliability)
+
+        print(
+            f"The most suitable architecture is {most_suitable_architecture[0]} with energy consumption {most_suitable_architecture[1]} and reliability {most_suitable_architecture[2]}")
+
+        plt.xlabel("Energy Consumption")
+        plt.ylabel("Reliability")
+        plt.title("Pareto Front for Different Architectures")
+        plt.legend()
         plt.show()
 
-    def optimize(self):
-        pop = self.toolbox.population(n=self.pop_size)
-        hof = tools.ParetoFront()
-
-        stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("min", np.min, axis=0)
-
-        pop, log = algorithms.eaSimple(pop, self.toolbox, cxpb=0.5, mutpb=0.2, ngen=self.generations,
-                                       stats=stats, halloffame=hof, verbose=True)
-
-        return pop, log, hof
-
-
 if __name__ == "__main__":
-    risk_assessment = RiskAssessmentRIMOO(100, 50)
-    pop, log, hof = risk_assessment.optimize()
-    risk_assessment.plot_pareto_front(hof)
+    main()
