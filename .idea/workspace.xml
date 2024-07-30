@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be3ac2c3-7848-424c-8018-cae78c8c81cb" name="Changes" comment="Initial Commit">
+    <list default="true" id="be3ac2c3-7848-424c-8018-cae78c8c81cb" name="Changes" comment="Changes Commited in RA Logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RISK_ASSESSMENT_RIMOO.py" beforeDir="false" afterPath="$PROJECT_DIR$/RISK_ASSESSMENT_RIMOO.py" afterDir="false" />
     </list>
@@ -27,7 +27,7 @@
     <setting file="file://$PROJECT_DIR$/RISK_ASSESSMENT_RIMOO.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
@@ -105,7 +105,10 @@
       <workItem from="1722004861512" duration="8449000" />
       <workItem from="1722254916985" duration="1938000" />
       <workItem from="1722259112435" duration="1635000" />
-      <workItem from="1722276348001" duration="518000" />
+      <workItem from="1722276348001" duration="674000" />
+      <workItem from="1722277048089" duration="10499000" />
+      <workItem from="1722330747418" duration="168000" />
+      <workItem from="1722347001921" duration="10495000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <option name="closed" value="true" />
@@ -115,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721848281135</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Changes Commited in RA Logic">
+      <option name="closed" value="true" />
+      <created>1722276946435</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1722276946435</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -134,10 +145,11 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial Commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial Commit" />
+    <MESSAGE value="Changes Commited in RA Logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes Commited in RA Logic" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Multi_Objective_Optimization_NSGA_II_ATAM$MOO_NSGA_II.coverage" NAME="MOO-NSGA-II Coverage Results" MODIFIED="1722255290469" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Multi_Objective_Optimization_NSGA_II_ATAM$RISK_ASSESSMENT_RIMOO.coverage" NAME="RISK_ASSESSMENT_RIMOO Coverage Results" MODIFIED="1722276828019" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Multi_Objective_Optimization_NSGA_II_ATAM$RISK_ASSESSMENT_RIMOO.coverage" NAME="RISK_ASSESSMENT_RIMOO Coverage Results" MODIFIED="1722356835485" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
